@@ -37,7 +37,7 @@ class Floorplan {
       width: 8,
       length: 8,
       height: 4,
-      position: { x: -4, z: -4 },
+      position: { x: 0, z: 0 },
     });
     this.intersected;
     window.addEventListener('resize', this.onWindowResize.bind(this), false);

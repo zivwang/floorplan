@@ -14,13 +14,14 @@ export default class RoomController {
   }
   createRoom(opts) {
     const room = new Room(opts);
-    this.rooms.push(room.mesh);
+    this.rooms.push(room);
     this.controller.addEventCallback('dragstart', event => {
-      this.scene.add(room.skeleton);
-      this.scene.add(room.light);
-      if (this.lastLight && this.lastLight !== room.light.uuid)
+      this.scene.add(event.object.skeleton);
+      this.scene.add(event.object.light);
+      if (this.lastLight && this.lastLight !== event.object.light.uuid)
         this.scene.remove(this.scene.getObjectByName(this.lastLight));
-      room.updateSkeleton(
+      Room.updatePosition(
+        event.object.skeleton,
         event.object,
         this.getFloorHeight(event.object.floor),
       );
@@ -28,11 +29,17 @@ export default class RoomController {
       updateStats(event.object);
     });
     this.controller.addEventCallback('drag', event => {
-      room.updateSkeleton(
+      Room.updatePosition(
+        event.object.skeleton,
         event.object,
         this.getFloorHeight(event.object.floor),
       );
-      room.updateLight(event.object, this.getFloorHeight(event.object.floor));
+      Room.updatePosition(
+        event.object.light,
+        event.object,
+        this.getFloorHeight(event.object.floor),
+        true,
+      );
       event.object.position.y = this.getFloorHeight(event.object.floor);
       updateStats(event.object);
     });
@@ -40,19 +47,18 @@ export default class RoomController {
       event.object.position.x = event.object.position.x.roundTo(1);
       event.object.position.y = this.getFloorHeight(event.object.floor);
       event.object.position.z = event.object.position.z.roundTo(1);
-      this.scene.remove(this.scene.getObjectByName(room.skeleton.name));
+      this.scene.remove(this.scene.getObjectByName(event.object.skeleton.name));
       updateStats(event.object);
-
-      this.lastLight = room.light.name;
+      this.lastLight = event.object.light.name;
     });
     this.controller.createDragController(this.rooms);
 
     this.floorHeights[opts.floor] = this.floorHeights[opts.floor]
       ? Math.max(this.floorHeights[opts.floor], opts.height)
       : opts.height;
-    room.mesh.position.y = this.getFloorHeight(opts.floor);
-    room.mesh.name = `Room ${this.rooms.length}`;
-    this.scene.add(room.mesh);
+    room.position.y = this.getFloorHeight(opts.floor);
+    room.name = `Room ${this.rooms.length}`;
+    this.scene.add(room);
     this.updateFloor(this.selectedFloor);
     this.updateDropdown();
     updateRooms(this.rooms);

@@ -37,8 +37,10 @@ export default class Room {
     room.receiveShadow = true;
     room.needsUpdate = true;
     room.highlight = true;
-    this.mesh = room;
-    this.shader = new Mesh(this.createGeometry(), Room.createShaderMaterial());
+    room.height = opts.height;
+    room.width = opts.width;
+    room.length = opts.length;
+
     let skeleton = new Mesh(
       this.createSkeletonGeo(),
       Room.createSkeletonMaterial(),
@@ -48,16 +50,17 @@ export default class Room {
     this.rotate(skeleton);
     skeleton.name = skeleton.uuid;
     skeleton.needsUpdate = true;
-    skeleton.position.x = this.opts.width / 2 + room.position.x.roundTo(1);
-    skeleton.position.z = room.position.z.roundTo(1) - this.opts.length / 2;
-    this.skeleton = skeleton;
-    this.light = new PointLight(0xffffff, 0.35, 10);
-    this.light.name = this.light.uuid;
-    this.light.position.x = this.opts.width / 2 + room.position.x.roundTo(1);
-    this.light.position.y = this.opts.height;
-    this.light.position.z = room.position.z.roundTo(1) - this.opts.length / 2;
+    skeleton.position.set(room.position.x, opts.height / 2, room.position.z);
 
-    return this;
+    room.skeleton = skeleton;
+
+    room.light = new PointLight(0xffffff, 0.35, 10);
+    room.light.name = room.light.uuid;
+    room.light.position.x = this.opts.width / 2 + room.position.x.roundTo(1);
+    room.light.position.y = this.opts.height;
+    room.light.position.z = room.position.z.roundTo(1) - this.opts.length / 2;
+
+    return room;
   }
 
   rotate(mesh) {
@@ -83,6 +86,7 @@ export default class Room {
       color: 'lightgray',
       opacity: 0.3,
       specular: 0x050505,
+      depthTest: true,
     });
   }
 
@@ -90,23 +94,14 @@ export default class Room {
     return new MeshLambertMaterial({ color: 'lightgray', opacity: 0.5 });
   }
 
-  updateSkeleton(object, floorHeight) {
-    this.skeleton.position.x =
-      this.opts.position.x + this.opts.width / 2 + object.position.x.roundTo(1);
-    this.skeleton.position.y = this.opts.height / 2 + floorHeight;
-    this.skeleton.position.z =
-      object.position.z.roundTo(1) -
-      this.opts.length / 2 -
-      this.opts.position.z;
-  }
-  updateLight(object, floorHeight) {
-    this.light.position.x =
-      this.opts.position.x + this.opts.width / 2 + object.position.x.roundTo(1);
-    this.light.position.y = this.opts.height;
-    this.light.position.z =
-      object.position.z.roundTo(1) -
-      this.opts.length / 2 -
-      this.opts.position.z;
+  static updatePosition(target, object, floorHeight, lockY) {
+    if (target) {
+      target.position.set(
+        object.position.x.roundTo(1) + object.length / 2,
+        object.height / 2 + floorHeight,
+        object.position.z.roundTo(1) - object.width / 2,
+      );
+    }
   }
 
   createSkeletonGeo() {
@@ -124,10 +119,10 @@ export default class Room {
       amount: height,
       steps: 1,
       bevelEnabled: false,
-      curveSegments: 2,
+      curveSegments: 8,
     };
     const { x, z } = position;
-
+    console.log(height, width, length, position, x, z);
     let roomShape = new THREE.Shape();
 
     roomShape.moveTo(x, z);
