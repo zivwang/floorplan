@@ -17,7 +17,7 @@ import {
   ShaderMaterial,
 } from 'three';
 
-const WALL_SIZE = .25;
+const WALL_SIZE = 0.25;
 const DEFAULT_SIZE = 8;
 
 const defaultOpts = {
@@ -25,36 +25,39 @@ const defaultOpts = {
   width: DEFAULT_SIZE,
   length: DEFAULT_SIZE,
   position: new Vector2(0, 0),
-}
+};
 
 export default class Room {
   constructor(opts) {
-      this.opts = Object.assign(defaultOpts, opts);
-      let room = new Mesh(this.createGeometry(), Room.createMaterial());
-      this.rotate(room);
-      room.floor = opts.floor;
-      room.castShadow = true;
-      room.receiveShadow = true;
-      room.needsUpdate = true;
-      room.createGeometry = this.createGeometry.bind(this);
-      this.mesh = room;
-      this.shader = new Mesh(this.createGeometry(), Room.createShaderMaterial());
-      let skeleton = new Mesh(this.createSkeletonGeo(), Room.createSkeletonMaterial());
-      skeleton.castShadow = false;
-      skeleton.receiveShadow = false;
-      this.rotate(skeleton);
-      skeleton.name = skeleton.uuid;
-      skeleton.needsUpdate = true;
-      skeleton.position.x = this.opts.width / 2 + room.position.x.roundTo(1);
-      skeleton.position.z =   room.position.z.roundTo(1) - this.opts.length / 2;
-      this.skeleton = skeleton;
-      this.light = new PointLight( 0xffffff, .35, 10 );
+    this.opts = Object.assign(defaultOpts, opts);
+    let room = new Mesh(this.createGeometry(), Room.createMaterial());
+    this.rotate(room);
+    room.floor = opts.floor;
+    room.castShadow = true;
+    room.receiveShadow = true;
+    room.needsUpdate = true;
+    room.highlight = true;
+    this.mesh = room;
+    this.shader = new Mesh(this.createGeometry(), Room.createShaderMaterial());
+    let skeleton = new Mesh(
+      this.createSkeletonGeo(),
+      Room.createSkeletonMaterial(),
+    );
+    skeleton.castShadow = false;
+    skeleton.receiveShadow = false;
+    this.rotate(skeleton);
+    skeleton.name = skeleton.uuid;
+    skeleton.needsUpdate = true;
+    skeleton.position.x = this.opts.width / 2 + room.position.x.roundTo(1);
+    skeleton.position.z = room.position.z.roundTo(1) - this.opts.length / 2;
+    this.skeleton = skeleton;
+    this.light = new PointLight(0xffffff, 0.35, 10);
+    this.light.name = this.light.uuid;
+    this.light.position.x = this.opts.width / 2 + room.position.x.roundTo(1);
+    this.light.position.y = this.opts.height;
+    this.light.position.z = room.position.z.roundTo(1) - this.opts.length / 2;
 
-      this.light.position.x = this.opts.width / 2 + room.position.x.roundTo(1);
-      this.light.position.y = this.opts.height;
-      this.light.position.z =   room.position.z.roundTo(1) - this.opts.length / 2;
-
-      return this;
+    return this;
   }
 
   rotate(mesh) {
@@ -62,72 +65,86 @@ export default class Room {
   }
 
   static createSkeletonMaterial() {
-    return new MeshToonMaterial({ color: 'red', wireframe: true });
+    return new MeshToonMaterial({ color: 0xd800ff, wireframe: true });
   }
 
   static createShaderMaterial() {
-    let material = new ShaderMaterial( {
-        uniforms: {},
-        vertexShader: document.getElementById( 'vertexShader' ).textContent,
-        fragmentShader: document.getElementById( 'fragmentShader' ).textContent
-      });
+    let material = new ShaderMaterial({
+      uniforms: {},
+      vertexShader: document.getElementById('vertexShader').textContent,
+      fragmentShader: document.getElementById('fragmentShader').textContent,
+    });
     material.extensions.derivatives = true;
     return material;
   }
 
   static createMaterial() {
-    return new MeshPhongMaterial({ color: 'lightgray', opacity: .3, specular: 0x050505, });
+    return new MeshPhongMaterial({
+      color: 'lightgray',
+      opacity: 0.3,
+      specular: 0x050505,
+    });
   }
 
   static createMaterialOpac() {
-    return new MeshLambertMaterial({ color: 'lightgray', opacity: .1 });
+    return new MeshLambertMaterial({ color: 'lightgray', opacity: 0.5 });
   }
 
   updateSkeleton(object, floorHeight) {
-    this.skeleton.position.x = this.opts.width / 2 + object.position.x.roundTo(1);
-    this.skeleton.position.y = this.opts.height/2 + floorHeight;
-    this.skeleton.position.z =   object.position.z.roundTo(1) - this.opts.length / 2;
+    this.skeleton.position.x =
+      this.opts.position.x + this.opts.width / 2 + object.position.x.roundTo(1);
+    this.skeleton.position.y = this.opts.height / 2 + floorHeight;
+    this.skeleton.position.z =
+      object.position.z.roundTo(1) -
+      this.opts.length / 2 -
+      this.opts.position.z;
   }
   updateLight(object, floorHeight) {
-    this.light.position.x = this.opts.width / 2 + object.position.x.roundTo(1);
+    this.light.position.x =
+      this.opts.position.x + this.opts.width / 2 + object.position.x.roundTo(1);
     this.light.position.y = this.opts.height;
-    this.light.position.z =   object.position.z.roundTo(1) - this.opts.length / 2;
-
+    this.light.position.z =
+      object.position.z.roundTo(1) -
+      this.opts.length / 2 -
+      this.opts.position.z;
   }
 
   createSkeletonGeo() {
-    const geometry = new BoxBufferGeometry(this.opts.length, this.opts.width, this.opts.height);
+    const geometry = new BoxBufferGeometry(
+      this.opts.length,
+      this.opts.width,
+      this.opts.height,
+    );
     return geometry;
   }
-
 
   createGeometry() {
     const { height, width, length, position } = this.opts;
     const extrudeSettings = {
-        amount: height,
-        steps : 1,
-        bevelEnabled: false,
-        curveSegments: 8
+      amount: height,
+      steps: 1,
+      bevelEnabled: false,
+      curveSegments: 2,
     };
-    const { x, y } = position;
-
+    const { x, z } = position;
 
     let roomShape = new THREE.Shape();
 
-    roomShape.moveTo(x, y);
-    roomShape.lineTo(length + x, y);
-    roomShape.lineTo(length + x, y + width);
-    roomShape.lineTo(x , y + width);
-
+    roomShape.moveTo(x, z);
+    roomShape.lineTo(length + x, z);
+    roomShape.lineTo(length + x, z + width);
+    roomShape.lineTo(x, z + width);
     let holePath = new THREE.Path();
 
-    holePath.moveTo(x + WALL_SIZE, y + WALL_SIZE);
-    holePath.lineTo(x + length - WALL_SIZE, y + WALL_SIZE);
-    holePath.lineTo(x + length - WALL_SIZE,  y + width - WALL_SIZE);
-    holePath.lineTo(x + WALL_SIZE , y + width - WALL_SIZE);
+    holePath.moveTo(x + WALL_SIZE, z + WALL_SIZE);
+    holePath.lineTo(x + length - WALL_SIZE, z + WALL_SIZE);
+    holePath.lineTo(x + length - WALL_SIZE, z + width - WALL_SIZE);
+    holePath.lineTo(x + WALL_SIZE, z + width - WALL_SIZE);
     roomShape.holes.push(holePath);
-
-    const geometry = new THREE.ExtrudeBufferGeometry(roomShape, extrudeSettings);
+    const geometry = new THREE.ExtrudeBufferGeometry(
+      roomShape,
+      extrudeSettings,
+    );
     return geometry;
   }
 }

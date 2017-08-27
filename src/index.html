@@ -1,11 +1,13 @@
 <head>
-  <title>asd</title>
+  <title>Floorplan</title>
   <script src="./src/js/three.min.js"></script>
   <script src="./src/js/csg.js"></script>
 
   <script src="./src/js/ThreeCSG.js"></script>
   <link rel="stylesheet" type="text/css" href="./src/css/normalize.css" />
   <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono" rel="stylesheet">
+
   <link rel="stylesheet" type="text/css" href="./src/css/main.css" />
 </head>
 <script>
@@ -34,7 +36,7 @@ function onSubmit(e) {
 
 function onFloorSelect() {
   let select = window.document.getElementById('toolbar-floor');
-  window.floorplan.updateFloor(parseInt(select.value));
+  window.floorplan.roomController.updateFloor(parseInt(select.value));
 }
 
 </script>
@@ -67,7 +69,41 @@ function onFloorSelect() {
     </select>
   </div>
   <div class="toolbar">
+    <div class="scene">
+      <span>Your Floorplan</span>
+      <div id="scene">   
+      </div>
+    </div>
     <button onClick="onCreateButton()">Create Room</button>
+  </div>
+  <div class="window">
+    <div class="stat">
+      <label>
+      Name
+      </label>
+      <p id="stat-name">None</p>
+    </div>
+    <div class="stat">
+      <label>
+      x
+      </label>
+      <p id="stat-x">0</p>
+    </div>
+    <div class="stat">
+      <label>
+      y
+      </label>
+      <p id="stat-y">0</p>
+    </div>
+    <div class="stat">
+      <label>
+      z
+      </label>
+      <p id="stat-z">0</p>
+    </div>
+  </div>
+  <div id="cursor">
+  10, 20
   </div>
   <div id="room-modal">
     <div>

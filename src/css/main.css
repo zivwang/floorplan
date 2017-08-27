@@ -1,15 +1,18 @@
 * {
   font-family: 'Lato', sans-serif;
 }
-
+span {
+  font-family: 'Ubuntu', sans-serif;
+}
 .toolbar {
   position: fixed;
   bottom: 0;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   left: 0;
   margin: 48px;
   right: 0;
+  align-items: flex-end;
 }
 
 button {
@@ -17,7 +20,8 @@ button {
   font-family: 'Lato', sans-serif;
   background: white;
   border: 0;
-  background: #0291DD;
+  background: linear-gradient(to top, rgb(0, 113, 173), rgb(2, 145, 221));
+  border: 1px solid rgb(2, 145, 221);
   color: white;
   font-weight: 600;
   font-size: 18px;
@@ -25,8 +29,8 @@ button {
   transition-duration: .25s;
   cursor: pointer;
   box-shadow: 0 15px 30px 0 rgba(0, 0, 0, 0.25);
+  height: 60px;
 }
-
 
 button:hover {
   transform: scale(1.05);
@@ -48,7 +52,7 @@ button:hover {
   padding: 48px;
   border-radius: 8px;
   max-width: 400px;
- transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   position: fixed;
   left: 50%;
   top: 50%;
@@ -72,7 +76,7 @@ button:hover {
 }
 
 .modal-form input:focus {
-  border-color: #0291DD;
+  border-color: #0291dd;
 }
 
 .modal-form label {
@@ -87,21 +91,117 @@ button:hover {
   width: 100%;
   margin-top: 24px;
   box-shadow: 0 5px 30px 0 rgba(0, 0, 0, 0.15);
-
 }
 
 .close-btn {
   background: white;
-  color: #0291DD;
+  color: #0291dd;
 }
 
 .toolbar-floor {
   position: fixed;
-  top: 36px;
-  right: 36px;
+  top: 24px;
+  right: 24px;
   background: white;
   padding: 18px 24px;
   border-radius: 8px;
   box-shadow: 0 5px 30px 0 rgba(0, 0, 0, 0.15);
   font-size: 18px;
+}
+
+.window {
+  position: fixed;
+  left: 24px;
+  top: 24px;
+  background: linear-gradient(
+    to top,
+    rgba(230, 230, 230, 1),
+    rgba(245, 245, 245, 1)
+  );
+  box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.2);
+  width: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  border-top: 1px solid white;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.stat {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #eaeaea;
+  padding: 12px 18px;
+  font-size: 18px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat p {
+  padding: 0;
+  font-weight: 400;
+  font-family: 'Ubuntu', sans-serif;
+
+  margin: 0;
+}
+
+.stat label {
+  opacity: .75;
+}
+
+#cursor {
+  position: fixed;
+  background: #1b1b1b;
+  font-size: 14px;
+  opacity: .35;
+  font-weight: 400;
+  color: white;
+  border-radius: 4px;
+  margin: 12px;
+  padding: 8px 12px;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+#stat-y {
+  color: green;
+}
+
+#stat-z {
+  color: blue;
+}
+
+#stat-x {
+  color: red;
+}
+
+.scene {
+  border-radius: 8px;
+  background: linear-gradient(
+    to top,
+    rgba(230, 230, 230, 1),
+    rgba(245, 245, 245, 1)
+  );
+  box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.2);
+  padding: 24px 32px;
+}
+
+.scene > span {
+  font-size: 18px;
+}
+
+#scene {
+  margin-top: 24px;
+
+  display: flex;
+}
+
+#scene > p {
+  padding: 18px 32px;
+  border-radius: 4px;
+  margin: 0;
+  font-size: 28px;
+  border: 1px solid #cccccc;
+}
+
+#scene > p:not(:last-child) {
+  margin-right: 32px;
 }
