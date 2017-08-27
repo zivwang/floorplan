@@ -1,0 +1,90 @@
+<head>
+  <title>asd</title>
+  <script src="./src/js/three.min.js"></script>
+  <script src="./src/js/csg.js"></script>
+
+  <script src="./src/js/ThreeCSG.js"></script>
+  <link rel="stylesheet" type="text/css" href="./src/css/normalize.css" />
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="./src/css/main.css" />
+</head>
+<script>
+function onCreateButton() {
+  var elm =window.document.getElementById("room-modal");
+	elm.style.opacity = '1';
+  elm.style['z-index'] = 1;
+}
+function onClose() {
+  var elm = window.document.getElementById("room-modal");
+	elm.style.opacity = '0';
+  elm.style['z-index'] = -1;
+}
+
+function onSubmit(e) {
+  var form = window.document.getElementById("room-form");
+  onClose();
+  window.floorplan.createRoom({
+    height: parseInt(form.elements['height'].value),
+    width: parseInt(form.elements['width'].value),
+    length: parseInt(form.elements['l'].value),
+    floor: parseInt(form.elements['floor'].value - 1),
+  });
+  return false;
+}
+
+function onFloorSelect() {
+  let select = window.document.getElementById('toolbar-floor');
+  window.floorplan.updateFloor(parseInt(select.value));
+}
+
+</script>
+<script type="x-shader/x-vertex" id="vertexShader">
+  attribute vec3 center;
+  varying vec3 vCenter;
+  void main() {
+    vCenter = center;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+  }
+</script>
+
+<script type="x-shader/x-fragment" id="fragmentShader">
+  varying vec3 vCenter;
+  float edgeFactorTri() {
+    vec3 d = fwidth( vCenter.xyz );
+    vec3 a3 = smoothstep( vec3( 0.0 ), d * 1.5, vCenter.xyz );
+    return min( min( a3.x, a3.y ), a3.z );
+  }
+  void main() {
+    gl_FragColor.rgb = mix( vec3( 1.0 ), vec3( 0.2 ), edgeFactorTri() );
+    gl_FragColor.a = 1.0;
+  }
+</script>
+<body>
+  <div class="toolbar-floor">
+    Floor
+    <select onchange="onFloorSelect()" id="toolbar-floor">
+      <option value="0">1</option>
+    </select>
+  </div>
+  <div class="toolbar">
+    <button onClick="onCreateButton()">Create Room</button>
+  </div>
+  <div id="room-modal">
+    <div>
+      <h5 class="modal-header">Create a new room</h5>
+      <form id="room-form" class="modal-form">
+        <label>Height</label>
+        <input value="4" type="number" name="height" />
+        <label>Width</label>
+        <input value="8" type="number" name="width" />
+        <label>Length</label>
+        <input value="8" type="number" name="l" />
+        <hr />
+        <label>Floor</label>
+        <input value="1" type="number" name="floor" />
+        <button onclick="onSubmit()" type="button">Submit</button>
+        <button class="close-btn" onclick="onClose()" type="button">Close</button>
+      </form>
+    </div>
+  </div>
+</body>
