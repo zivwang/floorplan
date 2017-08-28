@@ -17,6 +17,8 @@ import {
   ShaderMaterial,
 } from 'three';
 
+import RoomMaterial from '../materials/RoomMaterial';
+
 const WALL_SIZE = 0.25;
 const DEFAULT_SIZE = 8;
 
@@ -29,17 +31,28 @@ const defaultOpts = {
 
 export default class Room {
   constructor(opts) {
-    this.opts = Object.assign(defaultOpts, opts);
+    const newOpts = Object.assign(defaultOpts, opts);
+    this.height = newOpts.height;
+    this.width = newOpts.width;
+    this.length = newOpts.length;
+    this.floor = newOpts.floor;
+    this.position = newOpts.position;
+    return this.createRoom();
+  }
+  createRoom() {
+    const { height, width, position, length, floor } = this;
+
     let room = new Mesh(this.createGeometry(), Room.createMaterial());
     this.rotate(room);
-    room.floor = opts.floor;
+    console.log(room);
+    room.floor = floor;
     room.castShadow = true;
     room.receiveShadow = true;
     room.needsUpdate = true;
     room.highlight = true;
-    room.height = opts.height;
-    room.width = opts.width;
-    room.length = opts.length;
+    room.height = height;
+    room.width = width;
+    room.length = length;
 
     let skeleton = new Mesh(
       this.createSkeletonGeo(),
@@ -50,15 +63,15 @@ export default class Room {
     this.rotate(skeleton);
     skeleton.name = skeleton.uuid;
     skeleton.needsUpdate = true;
-    skeleton.position.set(room.position.x, opts.height / 2, room.position.z);
+    skeleton.position.set(room.position.x, height / 2, room.position.z);
 
     room.skeleton = skeleton;
 
     room.light = new PointLight(0xffffff, 0.35, 10);
     room.light.name = room.light.uuid;
-    room.light.position.x = this.opts.width / 2 + room.position.x.roundTo(1);
-    room.light.position.y = this.opts.height;
-    room.light.position.z = room.position.z.roundTo(1) - this.opts.length / 2;
+    room.light.position.x = width / 2 + room.position.x.roundTo(1);
+    room.light.position.y = height;
+    room.light.position.z = room.position.z.roundTo(1) - length / 2;
 
     return room;
   }
@@ -82,12 +95,7 @@ export default class Room {
   }
 
   static createMaterial() {
-    return new MeshPhongMaterial({
-      color: 'lightgray',
-      opacity: 0.3,
-      specular: 0x050505,
-      depthTest: true,
-    });
+    return new RoomMaterial();
   }
 
   static createMaterialOpac() {
@@ -106,15 +114,25 @@ export default class Room {
 
   createSkeletonGeo() {
     const geometry = new BoxBufferGeometry(
-      this.opts.length,
-      this.opts.width,
-      this.opts.height,
+      this.length,
+      this.width,
+      this.height,
     );
     return geometry;
   }
 
+  static updateLength(room, amount) {
+    console.log('amount added', amount, room);
+    let opts = {};
+    opts.height = room.height;
+    opts.width = room.width;
+    opts.length = room.length + amount;
+    opts.position = room.position;
+    return new Room(opts);
+  }
+
   createGeometry() {
-    const { height, width, length, position } = this.opts;
+    const { height, width, length, position } = this;
     const extrudeSettings = {
       amount: height,
       steps: 1,

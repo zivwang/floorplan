@@ -3,6 +3,7 @@ import {
   AmbientLight,
   OrthographicCamera,
   PointLight,
+  CanvasRenderer,
   PlaneBufferGeometry,
   MeshPhongMaterial,
   WebGLRenderer,
@@ -49,6 +50,8 @@ class Floorplan {
     const intersects = this.raycaster.intersectObjects(this.scene.children);
 
     if (intersects.length > 2) {
+      this.roomController.selectedFace = intersects[0].face;
+
       if (
         this.intersected != intersects[0].object &&
         intersects[0].object.highlight
@@ -57,7 +60,6 @@ class Floorplan {
           this.intersected.material.emissive.setHex(
             this.intersected.currentHex,
           );
-
         this.intersected = intersects[0].object;
         this.intersected.currentHex = this.intersected.material.emissive.getHex();
         this.intersected.material.emissive.setHex(0xff0000);
@@ -146,7 +148,7 @@ class Floorplan {
     console.log('Initializing grid...');
     this.scene.add(new AxisHelper(40));
     let geometry = new PlaneBufferGeometry(512, 512, 128, 128);
-    let material = new MeshPhongMaterial({ color: 0xffffff, opacity: 0.35 });
+    let material = new MeshPhongMaterial({ color: 0xffffff, opacity: 0.7 });
     let wireframeMaterial = new MeshPhongMaterial({
       color: 0xf5f5f5,
       wireframe: true,
