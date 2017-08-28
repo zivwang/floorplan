@@ -121,16 +121,6 @@ export default class Room {
     return geometry;
   }
 
-  static updateLength(room, amount) {
-    console.log('amount added', amount, room);
-    let opts = {};
-    opts.height = room.height;
-    opts.width = room.width;
-    opts.length = room.length + amount;
-    opts.position = room.position;
-    return new Room(opts);
-  }
-
   createGeometry() {
     const { height, width, length, position } = this;
     const extrudeSettings = {
@@ -140,7 +130,7 @@ export default class Room {
       curveSegments: 8,
     };
     const { x, z } = position;
-    console.log(height, width, length, position, x, z);
+    console.log('height', height, 'width', width, 'length', length, position, x, z);
     let roomShape = new THREE.Shape();
 
     roomShape.moveTo(x, z);
@@ -158,6 +148,8 @@ export default class Room {
       roomShape,
       extrudeSettings,
     );
+    geometry.elementsNeedUpdate = true;
+
     return geometry;
   }
 }

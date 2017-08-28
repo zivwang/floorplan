@@ -232,6 +232,16 @@ button:hover {
   fill: black;
 }
 
+.tools > div:hover {
+  background: rgba(0, 0, 0, 0.1);
+
+}
+
+.tools > div:hover:active {
+  background: rgba(0, 0, 0, 0.05);
+
+}
+
 .tools > div path {
   fill: #9a9a9a;
 }
@@ -270,10 +280,18 @@ button:hover {
   content: 'Resize tool';
 }
 
+#tools-move {
+  border-radius: 40px 0 0 40px;
+}
+
+#tools-delete {
+  border-radius: 0 40px 40px 0;
+}
+
 .tools > div:hover::after {
   opacity: 1;
 }
 
-.tools::hover > div::after {
+.tools:hover > div::after {
   transform: translateY(0) translateX(-50%);
 }

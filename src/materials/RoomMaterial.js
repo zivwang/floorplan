@@ -3,10 +3,9 @@ import { MeshPhongMaterial } from 'three';
 class RoomMaterial extends MeshPhongMaterial {
   constructor(opts) {
     super({
-      color: 'lightgray',
-      opacity: 0.3,
-      specular: 0x050505,
-      depthTest: true,
+      color: 0x1f8eed,
+      specular: 0xffffff,
+      reflectivity: .25,
     });
   }
 }

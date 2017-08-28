@@ -9,6 +9,7 @@ import {
   WebGLRenderer,
   Color,
   Scene,
+  MeshBasicMaterial,
   SpotLight,
   Raycaster,
   SpotLightHelper,
@@ -21,7 +22,7 @@ import {
 import Controller from './controller';
 import RoomController from './controllers/RoomController';
 
-const frustumSize = 20;
+const frustumSize = 40;
 
 class Floorplan {
   constructor() {
@@ -83,7 +84,7 @@ class Floorplan {
 
   initRenderer() {
     // renderer
-    this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
+    this.renderer = new WebGLRenderer({ antialias: true });
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMapSoft = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -103,7 +104,7 @@ class Floorplan {
       1,
       2000,
     );
-    this.camera.position.set(20, 20, 20);
+    this.camera.position.set(20, 30, 20);
     this.camera.rotation.order = 'YXZ';
     this.camera.rotation.y = -Math.PI / 4;
     this.camera.rotation.x = Math.atan(-1 / Math.sqrt(2));
@@ -132,8 +133,8 @@ class Floorplan {
   initScene() {
     console.log('Setting up the scene...');
     this.scene = new Scene();
-    this.scene.add(new AmbientLight(0xffffff, 0.1));
-    let spotLight = new SpotLight(0xffffff, 0.1);
+    this.scene.add(new AmbientLight(0xffffff, 0.8));
+    let spotLight = new SpotLight(0xffffff, 0.2);
     spotLight.position.set(15, 40, 10);
     spotLight.angle = Math.PI / 4;
     spotLight.penumbra = 0.25;
@@ -148,11 +149,10 @@ class Floorplan {
     console.log('Initializing grid...');
     this.scene.add(new AxisHelper(40));
     let geometry = new PlaneBufferGeometry(512, 512, 128, 128);
-    let material = new MeshPhongMaterial({ color: 0xffffff, opacity: 0.7 });
-    let wireframeMaterial = new MeshPhongMaterial({
-      color: 0xf5f5f5,
+    let material = new MeshPhongMaterial({ color: 0xffffff, opacity: 1, reflectivity: .25, specular: 0xffffff });
+    let wireframeMaterial = new MeshBasicMaterial({
+      color: 0xd0d0d0,
       wireframe: true,
-      opacity: 0.5,
     });
     let grid = new Mesh(geometry, material);
     let wireframe = new Mesh(geometry, wireframeMaterial);

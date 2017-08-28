@@ -3,6 +3,12 @@ import { updateStats, updateRooms } from '../stats';
 
 import CONTROLS from '../constants/controls';
 
+const SCALE_SENSITIVITY = 10;
+const MAX_SCALE = 2;
+const MIN_SCALE = 1;
+
+const MAX_LENGTH = 32;
+
 export default class RoomController {
   constructor(camera, renderer, scene, controller) {
     this.renderer = renderer;
@@ -42,6 +48,9 @@ export default class RoomController {
           break;
         case CONTROLS.DELETE:
           break;
+        case CONTROLS.SCALE:
+          this.handleScaleDrag(event);
+          break;
       }
     });
     this.controller.addEventCallback('dragend', event => {
@@ -51,6 +60,9 @@ export default class RoomController {
           this.handleMoveDragEnd(event);
           break;
         case CONTROLS.DELETE:
+          break;
+        case CONTROLS.SCALE:
+          this.handleScaleDragEnd(event);
           break;
       }
     });
@@ -70,16 +82,42 @@ export default class RoomController {
   handleScaleDragStart(event) {
     console.log('scale start');
     console.log(this.selectedFace);
-    if (!this.normal) return;
+    this.dragStartPosition = event.object.position.clone();
+    console.log(this.dragStartPosition);
+    if (!this.selectedFace) return;
     if (this.selectedFace.normal.x > 0) {
       console.log('side 1');
+      this.side = 1;
+      console.log(event.object.position.x);
     } else if (this.selectedFace.normal.x < 0) {
+      this.side = 3;
       console.log('side 3');
     } else if (this.selectedFace.normal.y > 0) {
+      this.side = 2;
       console.log('side 2');
     } else if (this.selectedFace.normal.y < 0) {
+      this.side = 4;
       console.log('side 4');
     }
+  }
+
+  handleScaleDrag(event) {
+    event.object.position.y = this.getFloorHeight(event.object.floor);
+    if (this.side === 1) {
+      const diff = (event.object.position.x - this.dragStartPosition.x) / SCALE_SENSITIVITY;
+      event.object.scale.set(Math.min(Math.max(event.object.scale.x + diff, MIN_SCALE), MAX_SCALE), event.object.scale.y, event.object.scale.z);
+    } else if (this.side === 4) {
+      const diff = (event.object.position.z - this.dragStartPosition.z) / SCALE_SENSITIVITY;
+      event.object.scale.set(event.object.scale.x, Math.min(Math.max(event.object.scale.y + diff, MAX_SCALE), MIN_SCALE), event.object.scale.z);
+    }
+    event.object.position.set(this.dragStartPosition.x, this.dragStartPosition.y, this.dragStartPosition.z);
+
+  }
+
+  handleScaleDragEnd(event) {
+    console.log('scale end', event.object.scale, Math.max((event.object.length * event.object.scale.x).roundTo(1), MIN_SCALE));
+    this.handleDelete(event);
+    this.createRoom({ position: this.dragStartPosition, width: (event.object.width * event.object.scale.y).roundTo(1), length: Math.min((event.object.length * event.object.scale.x).roundTo(1), MAX_LENGTH), height: event.object.height, floor: event.object.floor });
   }
 
   handleDelete(event) {
